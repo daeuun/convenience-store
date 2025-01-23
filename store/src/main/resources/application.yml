@@ -1,0 +1,28 @@
+spring:
+  profiles.active: local
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/convenience_store?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useUnicode=true&socketTimeout=3000&connectTimeout=3000&useSSL=false&rewriteBatchedStatements=true&&allowPublicKeyRetrieval=true
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: password
+      pool-name: dbcp-main
+      minimum-idle: 2
+      maximum-pool-size: 2
+      connection-timeout: 2500 # 2.5s
+      validation-timeout: 2500 # 2.5s
+      max-lifetime: 1800000 # 30min. NOTE: RDS wait_timeout: 28.80s
+      leak-detection-threshold: 11000 # 11s (3rd party client read timeout + 1s)
+      transaction-isolation: TRANSACTION_REPEATABLE_READ
+      connection-test-query: SELECT 1
+    mybatis:
+      mapper-locations: classpath:mapper/*.xml
+      type-aliases-package: com.store.api
+      configuration:
+        map-underscore-to-camel-case: true
+        default-fetch-size: 100
+        default-statement-timeout: 30
+
+server:
+  port: 8080
+  shutdown: graceful
