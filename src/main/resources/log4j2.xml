@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="DEFAULT_FILE_NAME">app</Property>
+        <Property name="DEFAULT_PATTERN">%d[%t][%-5level] %c(%F:%M:%L)-%m%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${DEFAULT_PATTERN}"/>
+        </Console>
+
+        <RollingFile name="file" fileName="/home/ec2-user/logs/${DEFAULT_FILE_NAME}.log"
+                     filePattern="/home/ec2-user/logs/app/${DEFAULT_FILE_NAME}_%d{yyyy-MM-dd}_%i.log">
+            <PatternLayout pattern="${DEFAULT_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+                <TimeBasedTriggeringPolicy module="true" interval="1"/><!-- DAILY ROLLING OVER -->
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="/home/ec2-user/logs/app/" maxDepth="1">
+                    <IfFileName glob="${DEFAULT_FILE_NAME}_*.log">
+                        <IfLastModified age="30d"/>
+                    </IfFileName>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.store.api" level="DEBUG"/>
+        <Logger name="org.hibernate" level="DEBUG"/>
+        <Logger name="org.springframework" level="DEBUG"/>
+        <Logger name="jdk.event.security" level="WARN"/>
+        <Logger name="org.apache.tomcat" level="INFO"/>
+        <Logger name="com.zaxxer.hikari.pool" level="WARN"/>
+        <Logger name="org.mybatis.spring" level="INFO"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+<!--            <AppenderRef ref="file"/>-->
+        </Root>
+    </Loggers>
+</Configuration>
