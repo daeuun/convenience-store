@@ -18,6 +18,9 @@ public class ProductRepository {
     }
 
     public List<Product> findAll(ProductSearchParam productSearchParam) {
+        if (productSearchParam == null) {
+            throw new IllegalArgumentException("Invalid productSearchParam");
+        }
         return productMapper.selectAll(productSearchParam);
     }
 

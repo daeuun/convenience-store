@@ -6,8 +6,9 @@ public enum ExceptionCode {
     INSUFFICIENT_REGULAR_STOCK("SP002", "일반 상품 재고가 부족합니다."),
     INSUFFICIENT_PROMOTION_STOCK("SP003", "프로모션 상품 재고가 부족합니다."),
     // promotion
-    CAN_GET_COMPLIMENTARY_QUANTITY("PR001", "프로모션 추가 혜택 구매 가능합니다.")
-    ;
+    CAN_GET_COMPLIMENTARY_QUANTITY("PR001", "프로모션 추가 혜택 구매 가능합니다."),
+    // order
+    INVALID_ORDER_QUANTITY("OR001", "주문 수량이 0 이상이어야합니다.");
 
     private final String code;
     private final String message;

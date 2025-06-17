@@ -1,8 +1,10 @@
 package com.store.api.product.model;
 
 import lombok.Getter;
+import org.apache.ibatis.type.Alias;
 
 @Getter
+@Alias("Product")
 public class Product {
     private final Long id;
     private final String name;

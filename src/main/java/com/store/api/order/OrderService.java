@@ -1,5 +1,6 @@
 package com.store.api.order;
 
+import com.store.api.common.exception.ExceptionCode;
 import com.store.api.order.model.FinalizedOrderDetailRequest;
 import com.store.api.order.model.Order;
 import com.store.api.order.model.OrderDetail;
@@ -60,20 +61,26 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderStatusResponse> validateOrder(OrderValidateRequest request) {
         List<OrderDetail> orderDetails = request.getOrderDetails();
+        for (OrderDetail orderDetail : orderDetails) {
+            if (orderDetail.quantity() <= 0) {
+                throw new IllegalArgumentException(ExceptionCode.INVALID_ORDER_QUANTITY.message());
+            }
+        }
         Long now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        boolean isPromotion = promotionService.validatePromotionPeriod(now);
+        boolean isPromotionPeriod = promotionService.validatePromotionPeriod(now);
         List<OrderStatusResponse> responses = new ArrayList<>();
         for (OrderDetail orderDetail : orderDetails) {
-            OrderStatus orderStatus = validateOrderStatus(orderDetail.productId(), orderDetail.quantity(), isPromotion);
+            OrderStatus orderStatus = validateOrderStatus(orderDetail.productId(), orderDetail.quantity(), isPromotionPeriod);
             OrderStatusResponse response = OrderStatusResponse.toResponse(orderDetail, orderStatus);
             responses.add(response);
         }
         return responses;
     }
 
-    public OrderStatus validateOrderStatus(Long productId, int orderQuantity, boolean isPromotion) {
+    public OrderStatus validateOrderStatus(Long productId, int orderQuantity, boolean isPromotionPeriod) {
         OrderStatus orderStatus;
         SaleProduct saleProduct = saleProductRepository.findByProductId(productId);
+        boolean isPromotion = isPromotionPeriod && saleProduct.getPromotionId() != null;
         if (!isEnoughStockToOrder(saleProduct, isPromotion, orderQuantity)) {
             return OrderStatus.OUT_OF_STOCK;
         }
@@ -111,6 +118,11 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         List<FinalizedOrderDetailRequest> orderDetails = request.getOrderDetailRequests();
+        for (FinalizedOrderDetailRequest orderDetail : orderDetails) {
+            if (orderDetail.getOrderDetail().quantity() <= 0) {
+                throw new IllegalArgumentException(ExceptionCode.INVALID_ORDER_QUANTITY.message());
+            }
+        }
         List<OrderItem> orderItems = orderDetails.stream()
                 .map(this::createOrderItemWithPromotionApplied)
                 .toList();

@@ -52,7 +52,7 @@ public class ProductService {
         return ProductResponse.from(product);
     }
 
-    // TODO:: 동시성 처리
+    @Transactional(readOnly = true)
     public StockResponse getStocks(Long productId) {
         SaleProduct saleProduct = saleProductRepository.findByProductId(productId);
         return StockResponse.from(saleProduct);
