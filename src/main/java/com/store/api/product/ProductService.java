@@ -40,7 +40,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductListResponse getProducts(ProductSearchParam searchParam) {
-        List<Product> products = productRepository.findAll(searchParam);
+        List<Product> products = productRepository.findBySearchParam(searchParam);
         List<ProductResponse> responses = products.stream().map(ProductResponse::from).toList();
         return ProductListResponse.from(responses);
     }

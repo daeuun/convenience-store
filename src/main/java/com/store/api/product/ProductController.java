@@ -7,7 +7,6 @@ import com.store.api.product.model.ProductUpdateRequest;
 import com.store.api.product.model.StockResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +29,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @Operation(summary = "상품 목록 조회", description = "상품 전체 목록을 조회")
+    @Operation(summary = "상품 목록 조회", description = "검색 조건에 따른 상품 목록을 조회")
     @GetMapping
     public ProductListResponse findAllProducts(ProductSearchParam productSearchParam) {
         return productService.getProducts(productSearchParam);

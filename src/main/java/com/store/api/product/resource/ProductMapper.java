@@ -15,13 +15,14 @@ public interface ProductMapper {
     @Select("""
     <script>
     SELECT * FROM product
-    WHERE <if test="lastId != null"> product.id &gt; #{lastId}</if>
+    WHERE product.id &gt; #{lastId}
+    <if test="name != null">AND MATCH(name) AGAINST(CONCAT(#{name}, '*') IN BOOLEAN MODE)</if>
     ORDER BY product.id DESC
     LIMIT #{limit}
     </script>
     """
     )
-    List<Product> selectAll(ProductSearchParam productSearchParam);
+    List<Product> selectBySearchParam(ProductSearchParam productSearchParam);
 
     @Select("""
     <script>

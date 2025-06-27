@@ -147,20 +147,19 @@ class ProductServiceTest {
     @Test
     void 상품_검색_조건에_맞는_상품_목록_조회_성공() {
         // given
-        ProductSearchParam searchParam = new ProductSearchParam(0, 10);
+        ProductSearchParam searchParam = new ProductSearchParam("콜라", 0L, 10);
         List<Product> products = List.of(
-                new Product(1L, "콜라1", 1000),
-                new Product(2L, "콜라2", 2000),
-                new Product(3L, "콜라3", 3000),
-                new Product(4L, "콜라4", 4000),
-                new Product(5L, "콜라5", 5000));
-        given(productRepository.findAll(searchParam)).willReturn(products);
+                new Product(1L, "콜라", 1000),
+                new Product(2L, "콜라1", 2000),
+                new Product(3L, "콜라콜라", 3000),
+                new Product(4L, "콜라**", 4000),
+                new Product(5L, "콜라 콜라", 5000));
+        given(productRepository.findBySearchParam(searchParam)).willReturn(products);
 
         // when
         ProductListResponse result = productService.getProducts(searchParam);
 
         // then
-        assertThat(result.getProducts()).hasSize(products.size());
         assertThat(result.getProducts())
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyElementsOf(
@@ -168,18 +167,16 @@ class ProductServiceTest {
                                 .map(ProductResponse::from)
                                 .toList()
                 );
-        for (int i = 0; i < products.size(); i++) {
-            assertThat(result.getProducts().get(i).getId()).isEqualTo(products.get(i).getId());
-            assertThat(result.getProducts().get(i).getName()).isEqualTo(products.get(i).getName());
-            assertThat(result.getProducts().get(i).getPrice()).isEqualTo(products.get(i).getPrice());
-        }
+        assertThat(result.getProducts())
+                .extracting(ProductResponse::getName)
+                .allMatch(name -> name.contains("콜라"));
     }
 
     @Test
     void 상품_검색_조건에_맞는_상품_없으면_빈_리스트_반환() {
         // given
-        ProductSearchParam searchParam = new ProductSearchParam(0, 10);
-        given(productRepository.findAll(searchParam)).willReturn(Collections.emptyList());
+        ProductSearchParam searchParam = new ProductSearchParam("없는상품", 0L, 10);
+        given(productRepository.findBySearchParam(searchParam)).willReturn(Collections.emptyList());
 
         // when
         ProductListResponse result = productService.getProducts(searchParam);
@@ -242,7 +239,7 @@ class ProductServiceTest {
     @Test
     void 상품_목록_조회시_검색조건이_null이면_예외() {
         //given
-        given(productRepository.findAll(null)).willThrow(new IllegalArgumentException("Invalid productSearchParam"));
+        given(productRepository.findBySearchParam(null)).willThrow(new IllegalArgumentException("Invalid productSearchParam"));
         //when & then
         assertThrows(IllegalArgumentException.class, () -> productService.getProducts(null));
     }

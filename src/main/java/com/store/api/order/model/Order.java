@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.apache.ibatis.type.Alias;
 
 @Getter
-@Alias("Order")
+@Alias("Orders")
 public class Order {
 
     public static final double MEMBERSHIP_DISCOUNT_RATE = 0.3;

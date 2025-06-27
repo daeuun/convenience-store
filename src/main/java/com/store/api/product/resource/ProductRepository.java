@@ -17,11 +17,11 @@ public class ProductRepository {
         this.productMapper = productMapper;
     }
 
-    public List<Product> findAll(ProductSearchParam productSearchParam) {
+    public List<Product> findBySearchParam(ProductSearchParam productSearchParam) {
         if (productSearchParam == null) {
             throw new IllegalArgumentException("Invalid productSearchParam");
         }
-        return productMapper.selectAll(productSearchParam);
+        return productMapper.selectBySearchParam(productSearchParam);
     }
 
     public Product findByProductId(Long productId) {

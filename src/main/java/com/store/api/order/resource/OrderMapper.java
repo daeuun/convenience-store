@@ -11,7 +11,7 @@ public interface OrderMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("""
     <script>
-    INSERT INTO `order`(total_order_price, membership_discount_price)
+    INSERT INTO orders(total_order_price, membership_discount_price)
     VALUES (
     #{totalOrderPrice},
     #{membershipDiscountPrice}
