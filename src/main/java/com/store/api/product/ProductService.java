@@ -71,9 +71,12 @@ public class ProductService {
             SaleProduct saleProduct = saleProductRepository.findByProductId(orderItem.getProductId());
             int regularQuantity = orderItem.getQuantity() - orderItem.getPromotionQuantity();
             int promotionQuantity = orderItem.getPromotionQuantity();
-            if (saleProduct.getRegularStock() <= 0 || saleProduct.getRegularStock() < regularQuantity ||
-                    saleProduct.getPromotionStock() <= 0 || saleProduct.getPromotionStock() < promotionQuantity) {
-                throw new IllegalArgumentException(ExceptionCode.OUT_OF_STOCK.message());
+            if (regularQuantity > 0) {
+                validateStockInsufficient(saleProduct.getRegularStock(), regularQuantity);
+            } else if (promotionQuantity > 0) {
+                validateStockInsufficient(saleProduct.getPromotionStock(), promotionQuantity);
+            } else {
+                throw new IllegalArgumentException("Invalid order item quantity");
             }
             saleProductRepository.decreaseRegularStock(regularQuantity, saleProduct.getProductId());
             saleProductRepository.decreasePromotionStock(promotionQuantity, saleProduct.getProductId());
@@ -83,6 +86,12 @@ public class ProductService {
             if (hasLock && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
+        }
+    }
+
+    private void validateStockInsufficient(int availableStock, int requiredQuantity) {
+        if (availableStock <= 0 || availableStock < requiredQuantity) {
+            throw new IllegalArgumentException(ExceptionCode.OUT_OF_STOCK.message());
         }
     }
 
