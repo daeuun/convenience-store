@@ -2,6 +2,8 @@ package com.store.api.product.saleproduct.resource;
 
 import com.store.api.common.typehandler.JsonMapTypeHandler;
 import com.store.api.product.saleproduct.model.SaleProduct;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Select;
@@ -37,4 +39,25 @@ public interface SaleProductMapper {
     </script>
     """)
     int updatePromotionStock(int quantity, Long productId);
+
+    @Delete("""
+    <script>
+    DELETE FROM sale_product
+    WHERE product_id = #{productId}
+    </script>
+    """)
+    void deleteById(Long productId);
+
+    @Insert("""
+    <script>
+    INSERT INTO sale_product(product_id, regular_stock, promotion_stock, promotion_id)
+    VALUES (
+    #{productId},
+    #{regularStock},
+    #{promotionStock},
+    #{promotionId}
+    )
+    </script>
+    """)
+    void insert(Long productId, int regularStock, int promotionStock, Long promotionId);
 }

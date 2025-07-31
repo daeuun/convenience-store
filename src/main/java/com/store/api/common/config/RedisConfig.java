@@ -1,8 +1,10 @@
 package com.store.api.common.config;
 
-import static org.springframework.data.redis.cache.RedisCacheConfiguration.*;
+import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -55,8 +57,12 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
                 .disableCachingNullValues()
                 .entryTtl(Duration.ofHours(1L));
-        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory())
-                .cacheDefaults(redisCacheConfiguration).build();
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+        cacheConfigurations.put("product:detail", redisCacheConfiguration.entryTtl(Duration.ofHours(6)));
+        return RedisCacheManager.builder(redisConnectionFactory())
+                .cacheDefaults(redisCacheConfiguration)
+                .withInitialCacheConfigurations(cacheConfigurations)
+                .build();
     }
 
 }

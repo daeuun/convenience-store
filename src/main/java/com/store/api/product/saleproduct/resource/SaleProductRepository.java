@@ -32,4 +32,15 @@ public class SaleProductRepository {
             throw new IllegalStateException("Fail decrease promotion stock");
         }
     }
+
+    public void deleteById(Long productId) {
+        saleProductMapper.deleteById(productId);
+    }
+
+    public void save(SaleProduct saleProduct) {
+        saleProductMapper.insert(saleProduct.getProductId(),
+                                 saleProduct.getRegularStock(),
+                                 saleProduct.getPromotionStock(),
+                                 saleProduct.getPromotionId());
+    }
 }

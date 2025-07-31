@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +30,13 @@ class ProductServiceIntegrationTest {
     @Autowired
     private SaleProductRepository saleProductRepository;
 
+    @BeforeEach
+    void setUp() {
+        Long productId = 1L;
+        saleProductRepository.deleteById(productId);
+        saleProductRepository.save(SaleProduct.of(0L, productId, 1, 0, 0L));
+    }
+
     @Test
     void 재고차감_동시성_테스트_5명_중_1명만_성공해야한다() throws InterruptedException {
         int threadCount = 5;
@@ -38,7 +46,7 @@ class ProductServiceIntegrationTest {
         for (int i = 0; i < threadCount; i++) {
             Future<Boolean> result = executorService.submit(() -> {
                 try {
-                    OrderItem orderItem = OrderItem.of(1L, "콜라", 1000, 10, 0);
+                    OrderItem orderItem = OrderItem.of(1L, "콜라", 1000, 1, 0);
                     productService.decreaseStock(orderItem);
                     return true;
                 } catch (Exception e) {
